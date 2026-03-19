@@ -1,19 +1,20 @@
+import { MovieDetail } from './features/movie-detail/movie-detail';
 import { Routes } from '@angular/router';
 
 export const routes: Routes = [
-  { path: '', loadChildren: () => import('./features/home/home-module').then((m) => m.HomeModule) },
+  { path: '', loadComponent: () => import('./features/home/home').then((m) => m.Home) },
   {
     path: 'movies',
-    loadChildren: () => import('./features/movies/movies-module').then((m) => m.MoviesModule),
+    loadComponent: () => import('./features/movies/movies').then((m) => m.Movies),
+    title: 'Moveland = Discover Movies',
   },
   {
     path: 'movie/:id',
-    loadChildren: () =>
-      import('./features/movie-detail/movie-detail-module').then((m) => m.MovieDetailModule),
+    loadComponent: () => import('./features/movie-detail/movie-detail').then((m) => m.MovieDetail),
   },
   {
     path: 'search',
-    loadChildren: () => import('./features/search/search-module').then((m) => m.SearchModule),
+    loadComponent: () => import('./features/search/search').then((m) => m.Search),
   },
   { path: '**', redirectTo: '', pathMatch: 'full' },
 ];

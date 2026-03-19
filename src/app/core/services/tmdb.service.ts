@@ -4,13 +4,14 @@ import { Observable, catchError, map, of } from 'rxjs';
 
 import { Genre } from '../interface/Genre';
 import { Movie } from '../interface/Movie';
+import { MovieDetailInt } from '../interface/MovieDetailInt';
 import { PaginationResponse } from './../interface/PaginationResponse';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
-export class TmdbServiceTs {
+export class TmdbService {
   private http = inject(HttpClient);
   private base = environment.tmdbBaseUrl;
 
@@ -56,8 +57,8 @@ export class TmdbServiceTs {
       );
   }
 
-  getMovieDetail(id: number): Observable<Movie> {
-    return this.http.get<Movie>(`${this.base}/movie/${id}`, {
+  getMovieDetail(id: number): Observable<MovieDetailInt> {
+    return this.http.get<MovieDetailInt>(`${this.base}/movie/${id}`, {
       params: new HttpParams().set('append_to_response', 'credits,similar,videos'),
     });
   }
@@ -78,7 +79,7 @@ export class TmdbServiceTs {
     );
   }
 
-  getImageUrl(path: string, size = 'w500'): string {
+  getImageUrl(path: string | null, size = 'w500'): string {
     return path ? `${environment.tmdbImageBaseUrl}${size}${path}` : 'assets/no-image.png';
   }
 

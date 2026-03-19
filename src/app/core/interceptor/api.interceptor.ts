@@ -1,14 +1,20 @@
-import { HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
+import { HttpHandler, HttpInterceptor, HttpInterceptorFn, HttpRequest } from '@angular/common/http';
 
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 
-@Injectable()
-export class ApiInterceptor implements HttpInterceptor {
-  intercept(req: HttpRequest<any>, next: HttpHandler) {
+export const apiInterceptor: HttpInterceptorFn = (req, next) => {
+  if (req.url.startsWith(environment.tmdbBaseUrl)) {
     const apiReq = req.clone({
-      params: req.params.set('apiKey', environment.tmdbApiKey),
+      params: req.params.set('api_key', environment.tmdbApiKey),
     });
-    return next.handle(apiReq);
+    return next(apiReq);
   }
-}
+  return next(req);
+  // intercept(req: HttpRequest<any>, next: HttpHandler) {
+  //   const apiReq = req.clone({
+  //     params: req.params.set('api_Key', environment.tmdbApiKey),
+  //   });
+  //   return next.handle(apiReq);
+  // }
+};

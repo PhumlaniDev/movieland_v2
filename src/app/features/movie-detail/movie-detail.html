@@ -1,0 +1,229 @@
+@if (loading()) {
+  <div class="min-h-screen flex items-center justify-center">
+    <div
+      class="w-12 h-12 border-4 border-amber-400 border-t-transparent rounded-full animate-spin"
+    ></div>
+  </div>
+}
+
+@if (movie(); as m) {
+  <article class="min-h-screen">
+    <!-- ── BACKDROP ──────────────────────────────────────── -->
+    <div class="relative h-[70vh] overflow-hidden">
+      <img [src]="backdropUrl()" [alt]="m.title" class="w-full h-full object-cover" />
+      <div
+        class="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/50 to-black/20"
+      ></div>
+      <div class="absolute inset-0 bg-gradient-to-r from-zinc-950 to-transparent"></div>
+
+      <!-- Play trailer button -->
+      @if (trailer()) {
+        <button
+          (click)="trailerOpen.set(true)"
+          class="absolute inset-0 flex items-center justify-center group"
+          aria-label="Play trailer"
+        >
+          <div
+            class="w-20 h-20 rounded-full border-2 border-white/40 flex items-center justify-center group-hover:border-amber-400 group-hover:bg-amber-400/10 transition-all duration-300 backdrop-blur-sm"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="w-8 h-8 text-white group-hover:text-amber-400 transition-colors ml-1"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+            >
+              <path d="M8 5v14l11-7z" />
+            </svg>
+          </div>
+        </button>
+      }
+
+      <!-- Back button -->
+      <a
+        routerLink="/"
+        class="absolute top-6 left-6 flex items-center gap-2 text-white/70 hover:text-white transition-colors text-sm"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="w-5 h-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+        </svg>
+        Back
+      </a>
+    </div>
+
+    <!-- ── DETAILS ─────────────────────────────────────── -->
+    <div class="max-w-7xl mx-auto px-6 -mt-40 relative z-10 pb-20">
+      <div class="flex flex-col md:flex-row gap-10">
+        <!-- Poster -->
+        <div class="shrink-0">
+          <img
+            [src]="posterUrl()"
+            [alt]="m.title"
+            class="w-48 md:w-64 rounded-2xl shadow-2xl shadow-black/50 border border-white/10"
+          />
+        </div>
+
+        <!-- Info -->
+        <div class="flex-1 pt-4 md:pt-40">
+          <div class="flex flex-wrap gap-2 mb-3">
+            @for (genre of m.genres; track genre.id) {
+              <span
+                class="text-xs px-3 py-1 rounded-full border border-amber-400/40 text-amber-400 font-medium"
+              >
+                {{ genre.name }}
+              </span>
+            }
+          </div>
+
+          <h1 class="font-display text-4xl md:text-6xl font-black text-white leading-tight mb-2">
+            {{ m.title }}
+          </h1>
+
+          @if (m.tagline) {
+            <p class="text-zinc-400 italic text-lg mb-4">"{{ m.tagline }}"</p>
+          }
+
+          <!-- Meta row -->
+          <div class="flex flex-wrap gap-6 text-sm text-zinc-400 mb-6">
+            <span class="flex items-center gap-1">
+              <span class="text-amber-400 font-bold text-base">
+                ★ {{ m.vote_average | number: '1.1-1' }}
+              </span>
+            </span>
+            <span>{{ m.release_date | date: 'MMMM d, yyyy' }}</span>
+            @if (m.runtime) {
+              <span>{{ m.runtime }} min</span>
+            }
+          </div>
+
+          <p class="text-zinc-300 text-base leading-relaxed max-w-2xl mb-8">{{ m.overview }}</p>
+
+          <!-- Actions -->
+          <div class="flex gap-4 flex-wrap">
+            @if (trailer()) {
+              <button
+                (click)="trailerOpen.set(true)"
+                class="px-6 py-3 bg-amber-500 hover:bg-amber-400 text-black font-bold rounded-xl transition-all duration-200 hover:scale-105 flex items-center gap-2"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="w-5 h-5"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+                Watch Trailer
+              </button>
+            }
+            <button
+              (click)="toggleWatchlist()"
+              class="px-6 py-3 border rounded-xl font-bold transition-all duration-200 flex items-center gap-2"
+              [class]="
+                inWatchlist()
+                  ? 'border-amber-400 text-amber-400 hover:bg-amber-400/10'
+                  : 'border-white/30 text-white hover:border-white/60 hover:bg-white/5'
+              "
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="w-5 h-5"
+                viewBox="0 0 24 24"
+                [attr.fill]="inWatchlist() ? 'currentColor' : 'none'"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
+                />
+              </svg>
+              {{ inWatchlist() ? 'In Watchlist' : 'Add to Watchlist' }}
+            </button>
+          </div>
+
+          <!-- Director -->
+          @if (director()) {
+            <div class="mt-6 text-sm text-zinc-400">
+              Directed by <span class="text-white font-semibold ml-1">{{ director()?.name }}</span>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- ── CAST ──────────────────────────────────────── -->
+      <section class="mt-16">
+        <h2 class="font-display text-2xl font-bold text-white mb-6">
+          <span class="text-amber-400">Top</span> Cast
+        </h2>
+        <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4">
+          @for (person of topCast(); track person.id) {
+            <div class="text-center group">
+              <div
+                class="aspect-square rounded-full overflow-hidden mb-2 border-2 border-transparent group-hover:border-amber-400 transition-colors"
+              >
+                <img
+                  [src]="castImage(person)"
+                  [alt]="person.name"
+                  loading="lazy"
+                  class="w-full h-full object-cover"
+                />
+              </div>
+              <p class="text-white text-xs font-semibold leading-tight">{{ person.name }}</p>
+              <p class="text-zinc-500 text-xs mt-0.5 line-clamp-1">{{ person.character }}</p>
+            </div>
+          }
+        </div>
+      </section>
+
+      <!-- ── SIMILAR MOVIES ─────────────────────────────── -->
+      @if (similar().length) {
+        <section class="mt-16">
+          <h2 class="font-display text-2xl font-bold text-white mb-6">
+            You Might <span class="text-amber-400">Also Like</span>
+          </h2>
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            @for (sim of similar().slice(0, 10); track sim.id) {
+              <app-movie-card [movie]="sim" />
+            }
+          </div>
+        </section>
+      }
+    </div>
+  </article>
+}
+
+<!-- ── TRAILER MODAL ──────────────────────────────────── -->
+@if (trailerOpen() && trailer()) {
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4"
+    (click)="trailerOpen.set(false)"
+  >
+    <div
+      class="relative w-full max-w-4xl aspect-video rounded-2xl overflow-hidden shadow-2xl"
+      (click)="$event.stopPropagation()"
+    >
+      <iframe
+        [src]="trailerUrl()"
+        class="w-full h-full"
+        frameborder="0"
+        allow="autoplay; encrypted-media"
+        allowfullscreen
+      ></iframe>
+      <button
+        (click)="trailerOpen.set(false)"
+        class="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-black transition-colors"
+        aria-label="Close"
+      >
+        ✕
+      </button>
+    </div>
+  </div>
+}

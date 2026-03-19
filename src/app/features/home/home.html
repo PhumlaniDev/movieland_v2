@@ -1,0 +1,203 @@
+<!-- ── HERO ─────────────────────────────────────────── -->
+<section class="relative min-h-[85vh] flex items-end overflow-hidden">
+  <!-- Backdrop -->
+  <div class="absolute inset-0">
+    @if (hero()) {
+      <img [src]="heroBackdrop()" alt="" class="w-full h-full object-cover" />
+    }
+    <div
+      class="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/60 to-transparent"
+    ></div>
+    <div class="absolute inset-0 bg-gradient-to-r from-zinc-950/80 to-transparent"></div>
+  </div>
+
+  <!-- Hero content -->
+  <div class="relative z-10 max-w-7xl mx-auto px-6 pb-16 w-full">
+    <div class="max-w-2xl">
+      <span
+        class="inline-block text-amber-400 text-xs font-bold tracking-[0.25em] uppercase mb-4 border border-amber-400/30 px-3 py-1 rounded-full"
+      >
+        Trending This Week
+      </span>
+      @if (hero(); as h) {
+        <h1
+          class="font-display text-5xl md:text-7xl font-black text-white leading-none mb-4 drop-shadow-2xl"
+        >
+          {{ h.title }}
+        </h1>
+        <p class="text-zinc-300 text-base md:text-lg line-clamp-3 mb-8 max-w-xl">
+          {{ h.overview }}
+        </p>
+        <div class="flex gap-4 flex-wrap">
+          <a [routerLink]="['/movie', h.id]" ...>View Details</a>
+          <button (click)="onHeroWatchlist()" ...>Add to Watchlist</button>
+        </div>
+      }
+      <div class="flex gap-4 flex-wrap">
+        <a
+          [routerLink]="['/movie', hero().id]"
+          class="px-6 py-3 bg-amber-500 hover:bg-amber-400 text-black font-bold rounded-xl transition-all duration-200 hover:scale-105 shadow-lg shadow-amber-500/30 flex items-center gap-2"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="w-5 h-5"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+          >
+            <path d="M8 5v14l11-7z" />
+          </svg>
+          View Details
+        </a>
+        <button
+          (click)="onHeroWatchlist()"
+          class="px-6 py-3 border border-white/30 hover:border-white/60 text-white font-bold rounded-xl transition-all duration-200 backdrop-blur-sm hover:bg-white/10 flex items-center gap-2"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="w-5 h-5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
+            />
+          </svg>
+          Add to Watchlist
+        </button>
+      </div>
+    </div>
+
+    <!-- Hero dots -->
+    <div class="flex gap-2 mt-10">
+      @for (m of trending().slice(0, 5); track m.id; let i = $index) {
+        <button
+          (click)="heroIndex.set(i)"
+          class="h-1 rounded-full transition-all duration-300"
+          [class]="heroIndex() === i ? 'w-8 bg-amber-400' : 'w-4 bg-white/30 hover:bg-white/50'"
+        ></button>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- ── SEARCH BAR ─────────────────────────────────────── -->
+<div class="max-w-7xl mx-auto px-6 -mt-6 relative z-20 mb-12">
+  <div
+    class="bg-zinc-900/90 backdrop-blur-xl border border-white/10 rounded-2xl p-2 flex gap-3 shadow-2xl"
+  >
+    <div class="flex-1 flex items-center gap-3 px-4">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="w-5 h-5 text-zinc-400 shrink-0"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+        />
+      </svg>
+      <input
+        [formControl]="searchCtrl"
+        type="search"
+        placeholder="Search movies, actors, genres…"
+        class="flex-1 bg-transparent text-white placeholder-zinc-500 text-base outline-none py-2"
+        (keydown.enter)="onSearch()"
+      />
+    </div>
+    <button
+      (click)="onSearch()"
+      class="px-6 py-2.5 bg-amber-500 hover:bg-amber-400 text-black font-bold rounded-xl transition-all duration-200 hover:scale-105 text-sm"
+    >
+      Search
+    </button>
+  </div>
+</div>
+
+<!-- ── MOVIE SECTIONS ─────────────────────────────────── -->
+<main class="max-w-7xl mx-auto px-6 space-y-14 pb-20">
+  <!-- Now Playing -->
+  <section>
+    <div class="flex items-baseline justify-between mb-6">
+      <h2 class="font-display text-2xl font-bold text-white">
+        <span class="text-amber-400">Now</span> Playing
+      </h2>
+      <a
+        routerLink="/movies/now-playing"
+        class="text-zinc-400 hover:text-amber-400 text-sm transition-colors"
+      >
+        See all →
+      </a>
+    </div>
+    @if (loading()) {
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        @for (i of skeletonItems; track i) {
+          <div class="aspect-[2/3] rounded-xl bg-zinc-800 animate-pulse"></div>
+        }
+      </div>
+    } @else {
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        @for (movie of nowPlaying().slice(0, 10); track movie.id) {
+          <app-movie-card [movie]="movie" />
+        }
+      </div>
+    }
+  </section>
+
+  <!-- Top Rated -->
+  <section>
+    <div class="flex items-baseline justify-between mb-6">
+      <h2 class="font-display text-2xl font-bold text-white">
+        <span class="text-amber-400">Top</span> Rated
+      </h2>
+      <a
+        routerLink="/movies/top-rated"
+        class="text-zinc-400 hover:text-amber-400 text-sm transition-colors"
+      >
+        See all →
+      </a>
+    </div>
+    @if (loading()) {
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        @for (i of skeletonItems; track i) {
+          <div class="aspect-[2/3] rounded-xl bg-zinc-800 animate-pulse"></div>
+        }
+      </div>
+    } @else {
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        @for (movie of topRated().slice(0, 10); track movie.id) {
+          <app-movie-card [movie]="movie" />
+        }
+      </div>
+    }
+  </section>
+
+  <!-- Upcoming -->
+  <section>
+    <div class="flex items-baseline justify-between mb-6">
+      <h2 class="font-display text-2xl font-bold text-white">
+        Coming <span class="text-amber-400">Soon</span>
+      </h2>
+    </div>
+    @if (loading()) {
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        @for (i of skeletonItems; track i) {
+          <div class="aspect-[2/3] rounded-xl bg-zinc-800 animate-pulse"></div>
+        }
+      </div>
+    } @else {
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        @for (movie of upcoming().slice(0, 5); track movie.id) {
+          <app-movie-card [movie]="movie" />
+        }
+      </div>
+    }
+  </section>
+</main>
