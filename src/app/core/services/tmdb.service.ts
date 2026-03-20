@@ -80,6 +80,7 @@ export class TmdbService {
   }
 
   getImageUrl(path: string | null, size = 'w500'): string {
+    if (!path) return 'assets/no-image.png';
     return path ? `${environment.tmdbImageBaseUrl}${size}${path}` : 'assets/no-image.png';
   }
 

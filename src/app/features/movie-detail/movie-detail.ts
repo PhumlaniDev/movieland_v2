@@ -65,6 +65,8 @@ export class MovieDetail implements OnInit {
   }
 
   castImage(person: CastMember): string {
-    return this.tmdb.getImageUrl(person.profile_path, 'w185');
+    return person.profile_path
+      ? this.tmdb.getImageUrl(person.profile_path, 'w185')
+      : 'assets/no-image.png';
   }
 }

@@ -36,6 +36,6 @@ export class MovieCard {
   }
 
   onImgError(event: Event): void {
-    (event.target as HTMLImageElement).src = 'assets/no-image.png';
+    (event.target as HTMLImageElement).src = '../../../assets/no-image.png';
   }
 }
