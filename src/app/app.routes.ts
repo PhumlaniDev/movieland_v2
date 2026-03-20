@@ -1,4 +1,3 @@
-import { MovieDetail } from './features/movie-detail/movie-detail';
 import { Routes } from '@angular/router';
 
 export const routes: Routes = [

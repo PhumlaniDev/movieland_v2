@@ -70,7 +70,7 @@ jobs:
   # ── CD: deploy to Netlify ────────────────────────────────
   deploy:
     name: Deploy
-    needs: install-and-build
+    needs: lint
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
 

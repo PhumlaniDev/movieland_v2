@@ -9,10 +9,4 @@ export const apiInterceptor: HttpInterceptorFn = (req, next) => {
     return next(apiReq);
   }
   return next(req);
-  // intercept(req: HttpRequest<any>, next: HttpHandler) {
-  //   const apiReq = req.clone({
-  //     params: req.params.set('api_Key', environment.tmdbApiKey),
-  //   });
-  //   return next.handle(apiReq);
-  // }
 };
