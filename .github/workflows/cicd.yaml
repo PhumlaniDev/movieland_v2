@@ -8,47 +8,69 @@ on:
     branches: [main]
 
 jobs:
-  # ── CI: lint, test, build ────────────────────────────────
-  build-lint:
+  install-and-build:
     name: Install Dependencies & Build
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout
+      - name: Checkout Code
         uses: actions/checkout@v6
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
           node-version: 24
           cache: npm
+
+      - name: Create environment file
+        run: node generate-env.js
+        env:
+          TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
       - name: Install dependencies
         run: npm ci
 
-      - name: Lint
-        run: npx run lint
+      - name: Run Prettier Fix
+        run: npx prettier --write "src/**/*.ts"
 
-      # - name: Test
-      #   run: npm run test -- --watch=false --browsers=ChromeHeadless
+      - name: Run Prettier Check
+        run: npx prettier --check "src/**/*.ts"
 
-      - name: Inject API key
-        run: |
-          sed -i "s|\${TMDB_API_KEY}|${{ secrets.TMDB_API_KEY }}|g" \
-            src/environments/environment.prod.ts
+      - name: Build Project
+        run: npm run build -- --configuration=production
 
-      - name: Build
-        run: npm run build -- --configuration production
-
-      - name: Upload build artifact
+      - name: Upload build artifact # ← share dist/ with docker job
         uses: actions/upload-artifact@v7.0.0
         with:
           name: dist
-          path: dist/movieland_v2/browser
+          path: dist/movieland_v2/
 
+  lint:
+    name: Lint Code
+    runs-on: ubuntu-latest
+    needs: install-and-build
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: 'npm'
+
+      - name: Create environment file
+        run: node generate-env.js
+        env:
+          TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Linter
+        run: npm run lint
   # ── CD: deploy to Netlify ────────────────────────────────
   deploy:
     name: Deploy
-    needs: build-lint
+    needs: install-and-build
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
 
