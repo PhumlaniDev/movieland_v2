@@ -76,6 +76,8 @@
       @for (m of trending().slice(0, 5); track m.id; let i = $index) {
         <button
           (click)="heroIndex.set(i)"
+          [attr.aria-label]="'Go to slide ' + (i + 1)"
+          [attr.aria-current]="heroIndex() === i ? 'true' : null"
           class="h-1 rounded-full transition-all duration-300"
           [class]="heroIndex() === i ? 'w-8 bg-amber-400' : 'w-4 bg-white/30 hover:bg-white/50'"
         ></button>
